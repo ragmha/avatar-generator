@@ -1,4 +1,5 @@
-import type { RGB } from "./types";
+import type { RGB, AvatarOptions, AvatarResult } from "./types";
+import sharp from "sharp";
 
 const LEVELS = [0, 85, 170, 255] as const;
 
@@ -47,4 +48,46 @@ export function quantizePixels(
     out[offset + 2] = b;
   }
   return out;
+}
+
+export async function generateAvatar(
+  inputPath: string,
+  outputPath: string,
+  options: AvatarOptions = {}
+): Promise<AvatarResult> {
+  const { pixelSize = 32, outputSize = 512 } = options;
+
+  // Downscale to pixel grid
+  const smallImage = await sharp(inputPath)
+    .resize(pixelSize, pixelSize, { fit: "cover", position: "centre" })
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // Quantize to 8-bit palette
+  const quantized = quantizePixels(
+    smallImage.data,
+    smallImage.info.width,
+    smallImage.info.height
+  );
+
+  // Scale back up with nearest-neighbor for crisp pixels
+  const result = await sharp(quantized, {
+    raw: {
+      width: smallImage.info.width,
+      height: smallImage.info.height,
+      channels: 3,
+    },
+  })
+    .resize(outputSize, outputSize, { kernel: sharp.kernel.nearest })
+    .png()
+    .toFile(outputPath);
+
+  return {
+    inputPath,
+    outputPath,
+    pixelSize,
+    outputSize,
+    fileSize: result.size,
+  };
 }
