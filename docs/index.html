@@ -3,22 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>8-Bit Avatar Generator</title>
+  <title>Retro Avatar Generator</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🎮 8-Bit Avatar Generator</h1>
-      <p class="subtitle">Upload a photo, get retro pixel art</p>
+      <h1>🎮 Retro Avatar Generator</h1>
+      <p class="subtitle">Upload a photo, pick a retro style</p>
     </header>
+
+    <div class="style-selector">
+      <button class="style-btn" data-style="1bit">
+        <span class="style-icon">⬛</span>
+        <span class="style-name">1-Bit</span>
+        <span class="style-desc">Monochrome</span>
+      </button>
+      <button class="style-btn" data-style="2bit">
+        <span class="style-icon">🟩</span>
+        <span class="style-name">2-Bit</span>
+        <span class="style-desc">Game Boy</span>
+      </button>
+      <button class="style-btn" data-style="4bit">
+        <span class="style-icon">🟦</span>
+        <span class="style-name">4-Bit</span>
+        <span class="style-desc">CGA</span>
+      </button>
+      <button class="style-btn active" data-style="8bit">
+        <span class="style-icon">🟥</span>
+        <span class="style-name">8-Bit</span>
+        <span class="style-desc">NES</span>
+      </button>
+      <button class="style-btn" data-style="16bit">
+        <span class="style-icon">🟪</span>
+        <span class="style-name">16-Bit</span>
+        <span class="style-desc">SNES</span>
+      </button>
+      <button class="style-btn" data-style="retro">
+        <span class="style-icon">📺</span>
+        <span class="style-name">Retro</span>
+        <span class="style-desc">Vintage CRT</span>
+      </button>
+      <button class="style-btn" data-style="notion">
+        <span class="style-icon">✏️</span>
+        <span class="style-name">Notion</span>
+        <span class="style-desc">Minimal Flat</span>
+      </button>
+    </div>
 
     <div class="controls">
       <label>
         Pixel Grid
         <input type="range" id="pixelSize" min="8" max="64" value="32" />
         <span id="pixelSizeLabel">32×32</span>
+      </label>
+      <label>
+        <span id="soundIcon">🔊</span>
+        <input type="checkbox" id="soundToggle" checked hidden />
       </label>
     </div>
 
@@ -39,7 +81,7 @@
       <div class="arrow" id="arrow" hidden>→</div>
 
       <div class="panel">
-        <h2>8-Bit Avatar</h2>
+        <h2 id="resultLabel">8-Bit Avatar</h2>
         <div class="result-zone" id="resultZone">
           <canvas id="avatarCanvas"></canvas>
           <p class="placeholder" id="placeholder">Your avatar will appear here</p>
@@ -57,6 +99,8 @@
     </footer>
   </div>
 
+  <script src="sounds.js"></script>
+  <script src="palettes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

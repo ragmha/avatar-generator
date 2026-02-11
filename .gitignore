@@ -3,6 +3,8 @@ dist/
 *.js
 !jest.config.js
 !docs/app.js
+!docs/palettes.js
+!docs/sounds.js
 *.d.ts
 *.map
 test_input.png

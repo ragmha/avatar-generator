@@ -6,34 +6,44 @@ import chalk from "chalk";
 import fs from "fs";
 import { generateAvatar } from "./pixelator";
 import { cleanPath, validateExtension, resolveOutputPath } from "./cli-utils";
+import type { BitStyle } from "./types";
 
 const BANNER = `
 ${chalk.cyan("╔═══════════════════════════════════════╗")}
-${chalk.cyan("║")}  ${chalk.bold.magenta("🎮  8-Bit Avatar Generator  🎮")}       ${chalk.cyan("║")}
-${chalk.cyan("║")}  ${chalk.gray("Drop your photo, get pixel art!")}      ${chalk.cyan("║")}
+${chalk.cyan("║")}  ${chalk.bold.magenta("🎮  Retro Avatar Generator  🎮")}       ${chalk.cyan("║")}
+${chalk.cyan("║")}  ${chalk.gray("Drop your photo, pick a style!")}      ${chalk.cyan("║")}
 ${chalk.cyan("╚═══════════════════════════════════════╝")}
 `;
+
+const VALID_STYLES: BitStyle[] = ["1bit", "2bit", "4bit", "8bit", "16bit", "retro", "notion"];
 
 interface CLIOptions {
   output?: string;
   pixels: string;
   size: string;
+  style: string;
 }
 
 program
   .name("avatar")
-  .description("Generate 8-bit pixel art avatars from photos")
+  .description("Generate retro pixel art avatars from photos")
   .version("1.0.0")
   .argument("[input]", "Path to input image (drag & drop supported)")
   .option("-o, --output <path>", "Output file path")
   .option("-p, --pixels <number>", "Pixel grid size (lower = more pixelated)", "32")
   .option("-s, --size <number>", "Output image size in pixels", "512")
+  .option("--style <style>", "Avatar style: 1bit, 2bit, 4bit, 8bit, 16bit, retro, notion", "8bit")
   .action(async (input: string | undefined, opts: CLIOptions) => {
     console.log(BANNER);
 
+    const style = opts.style as BitStyle;
+    if (!VALID_STYLES.includes(style)) {
+      console.error(chalk.red(`\n❌ Invalid style: ${style}. Use: ${VALID_STYLES.join(", ")}`));
+      process.exit(1);
+    }
+
     let inputPath = input;
 
-    // Interactive mode: prompt for file if not provided (supports drag & drop)
     if (!inputPath) {
       const answers = await inquirer.prompt([
         {
@@ -56,7 +66,6 @@ program
       inputPath = cleanPath(inputPath);
     }
 
-    // Validate input file
     if (!fs.existsSync(inputPath!)) {
       console.error(chalk.red(`\n❌ File not found: ${inputPath}`));
       process.exit(1);
@@ -64,9 +73,7 @@ program
 
     if (!validateExtension(inputPath!)) {
       console.error(
-        chalk.red(
-          `\n❌ Unsupported format. Use: jpg, jpeg, png, webp, gif, tiff, bmp`
-        )
+        chalk.red(`\n❌ Unsupported format. Use: jpg, jpeg, png, webp, gif, tiff, bmp`)
       );
       process.exit(1);
     }
@@ -86,15 +93,17 @@ program
     }
 
     console.log(chalk.gray(`  Input:      ${inputPath}`));
+    console.log(chalk.gray(`  Style:      ${style}`));
     console.log(chalk.gray(`  Output:     ${outputPath}`));
     console.log(chalk.gray(`  Grid:       ${pixelSize}x${pixelSize}`));
     console.log(chalk.gray(`  Size:       ${outputSize}x${outputSize}px\n`));
-    console.log(chalk.yellow("  ⏳ Generating your 8-bit avatar...\n"));
+    console.log(chalk.yellow(`  ⏳ Generating your ${style} avatar...\n`));
 
     try {
       const result = await generateAvatar(inputPath!, outputPath, {
         pixelSize,
         outputSize,
+        style,
       });
 
       const sizeKB = (result.fileSize / 1024).toFixed(1);
@@ -102,9 +111,7 @@ program
       console.log(chalk.white(`  📦 File size: ${sizeKB} KB`));
       console.log(chalk.white(`  📍 Saved to:  ${result.outputPath}\n`));
     } catch (err) {
-      console.error(
-        chalk.red(`\n❌ Error: ${(err as Error).message}`)
-      );
+      console.error(chalk.red(`\n❌ Error: ${(err as Error).message}`));
       process.exit(1);
     }
   });

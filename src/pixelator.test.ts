@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { generatePalette, nearestColor, quantizePixels } from "./pixelator";
+import { generatePalette, nearestColor, quantizePixels, getPalette } from "./pixelator";
 
 describe("generatePalette", () => {
   test("should return exactly 64 colors", () => {
@@ -109,5 +109,74 @@ describe("quantizePixels", () => {
       0, 0, 0,       255, 255, 255,
       85, 85, 85,    170, 170, 170,
     ]);
+  });
+});
+
+describe("multi-style palettes", () => {
+  test("1bit palette has 2 colors", () => {
+    expect(getPalette("1bit")).toHaveLength(2);
+  });
+
+  test("2bit palette has 4 colors", () => {
+    expect(getPalette("2bit")).toHaveLength(4);
+  });
+
+  test("4bit palette has 16 colors", () => {
+    expect(getPalette("4bit")).toHaveLength(16);
+  });
+
+  test("16bit palette has 216 colors", () => {
+    expect(getPalette("16bit")).toHaveLength(216);
+  });
+
+  test("retro palette has warm colors", () => {
+    const palette = getPalette("retro");
+    expect(palette.length).toBeGreaterThan(0);
+    palette.forEach(([r, g, b]) => {
+      expect(r).toBeGreaterThanOrEqual(0);
+      expect(r).toBeLessThanOrEqual(255);
+    });
+  });
+
+  test("notion palette has muted pastels", () => {
+    const palette = getPalette("notion");
+    expect(palette.length).toBeGreaterThan(0);
+  });
+});
+
+describe("quantizePixels with styles", () => {
+  test("1bit quantizes to black or white", () => {
+    const input = Buffer.from([30, 30, 30, 200, 200, 200]);
+    const result = quantizePixels(input, 2, 1, "1bit");
+    expect(result[0]).toBe(0);
+    expect(result[1]).toBe(0);
+    expect(result[2]).toBe(0);
+    expect(result[3]).toBe(255);
+    expect(result[4]).toBe(255);
+    expect(result[5]).toBe(255);
+  });
+
+  test("2bit quantizes to Game Boy green shades", () => {
+    const gbPalette = getPalette("2bit");
+    const input = Buffer.from([10, 10, 10]);
+    const result = quantizePixels(input, 1, 1, "2bit");
+    const pixel: [number, number, number] = [result[0], result[1], result[2]];
+    expect(gbPalette).toContainEqual(pixel);
+  });
+
+  test("retro quantizes to warm palette", () => {
+    const retroPalette = getPalette("retro");
+    const input = Buffer.from([128, 100, 80]);
+    const result = quantizePixels(input, 1, 1, "retro");
+    const pixel: [number, number, number] = [result[0], result[1], result[2]];
+    expect(retroPalette).toContainEqual(pixel);
+  });
+
+  test("notion quantizes to muted palette", () => {
+    const notionPalette = getPalette("notion");
+    const input = Buffer.from([200, 180, 220]);
+    const result = quantizePixels(input, 1, 1, "notion");
+    const pixel: [number, number, number] = [result[0], result[1], result[2]];
+    expect(notionPalette).toContainEqual(pixel);
   });
 });
