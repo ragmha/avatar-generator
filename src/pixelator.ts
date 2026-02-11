@@ -28,3 +28,23 @@ export function nearestColor(r: number, g: number, b: number): RGB {
   }
   return best;
 }
+
+export function quantizePixels(
+  buffer: Buffer,
+  width: number,
+  height: number
+): Buffer {
+  const out = Buffer.alloc(width * height * 3);
+  for (let i = 0; i < width * height; i++) {
+    const offset = i * 3;
+    const [r, g, b] = nearestColor(
+      buffer[offset],
+      buffer[offset + 1],
+      buffer[offset + 2]
+    );
+    out[offset] = r;
+    out[offset + 1] = g;
+    out[offset + 2] = b;
+  }
+  return out;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { generatePalette, nearestColor } from "./pixelator";
+import { generatePalette, nearestColor, quantizePixels } from "./pixelator";
 
 describe("generatePalette", () => {
   test("should return exactly 64 colors", () => {
@@ -62,5 +62,52 @@ describe("nearestColor", () => {
   test("returns RGB tuple type", () => {
     const result = nearestColor(128, 128, 128);
     expect(result).toHaveLength(3);
+  });
+});
+
+describe("quantizePixels", () => {
+  test("quantizes a single pixel to nearest palette color", () => {
+    const input = Buffer.from([40, 40, 40]);
+    const result = quantizePixels(input, 1, 1);
+    expect(result[0]).toBe(0);
+    expect(result[1]).toBe(0);
+    expect(result[2]).toBe(0);
+  });
+
+  test("quantizes multiple pixels", () => {
+    const input = Buffer.from([40, 40, 40, 220, 220, 220]);
+    const result = quantizePixels(input, 2, 1);
+    expect(result[0]).toBe(0);
+    expect(result[1]).toBe(0);
+    expect(result[2]).toBe(0);
+    expect(result[3]).toBe(255);
+    expect(result[4]).toBe(255);
+    expect(result[5]).toBe(255);
+  });
+
+  test("output buffer has same length as input", () => {
+    const input = Buffer.from([10, 100, 240, 200, 50, 130]);
+    const result = quantizePixels(input, 2, 1);
+    expect(result.length).toBe(input.length);
+  });
+
+  test("exact palette colors pass through unchanged", () => {
+    const input = Buffer.from([85, 170, 255]);
+    const result = quantizePixels(input, 1, 1);
+    expect(result[0]).toBe(85);
+    expect(result[1]).toBe(170);
+    expect(result[2]).toBe(255);
+  });
+
+  test("handles a 2x2 grid", () => {
+    const input = Buffer.from([
+      0, 0, 0,       255, 255, 255,
+      85, 85, 85,    170, 170, 170,
+    ]);
+    const result = quantizePixels(input, 2, 2);
+    expect(Array.from(result)).toEqual([
+      0, 0, 0,       255, 255, 255,
+      85, 85, 85,    170, 170, 170,
+    ]);
   });
 });
