@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.js
+!jest.config.js
+*.d.ts
+*.map
+test_input.png
+test_output.png
+*_8bit.png
+.DS_Store
