@@ -64,6 +64,8 @@ h1 {
 }
 
 .style-btn {
+  -webkit-appearance: none;
+  appearance: none;
   background: var(--surface);
   border: 2px solid var(--border);
   border-radius: var(--radius);
@@ -75,6 +77,9 @@ h1 {
   gap: 0.2rem;
   transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
   min-width: 80px;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.4;
 }
 
 .style-btn:hover {
