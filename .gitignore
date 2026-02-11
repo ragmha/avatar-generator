@@ -2,6 +2,7 @@ node_modules/
 dist/
 *.js
 !jest.config.js
+!docs/app.js
 *.d.ts
 *.map
 test_input.png

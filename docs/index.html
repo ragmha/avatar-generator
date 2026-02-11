@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8-Bit Avatar Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 8-Bit Avatar Generator</h1>
+      <p class="subtitle">Upload a photo, get retro pixel art</p>
+    </header>
+
+    <div class="controls">
+      <label>
+        Pixel Grid
+        <input type="range" id="pixelSize" min="8" max="64" value="32" />
+        <span id="pixelSizeLabel">32×32</span>
+      </label>
+    </div>
+
+    <div class="workspace">
+      <div class="panel">
+        <h2>Original</h2>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <div class="drop-content" id="dropContent">
+            <span class="drop-icon">📁</span>
+            <p>Drag & drop your photo here</p>
+            <p class="drop-hint">or click to browse</p>
+          </div>
+          <canvas id="originalCanvas" hidden></canvas>
+        </div>
+      </div>
+
+      <div class="arrow" id="arrow" hidden>→</div>
+
+      <div class="panel">
+        <h2>8-Bit Avatar</h2>
+        <div class="result-zone" id="resultZone">
+          <canvas id="avatarCanvas"></canvas>
+          <p class="placeholder" id="placeholder">Your avatar will appear here</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions" id="actions" hidden>
+      <button id="downloadBtn" class="btn btn-primary">⬇️ Download Avatar</button>
+      <button id="resetBtn" class="btn btn-secondary">🔄 Try Another</button>
+    </div>
+
+    <footer>
+      <p>No uploads to any server — everything runs in your browser.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
